@@ -1,0 +1,119 @@
+version: '3' 
+services:
+  # posrgres database for airflow metada
+  postgres:
+    build: postgres/docker
+    image: postgres
+    restart: always
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=brgroup
+    depends_on:
+      - spark-submit
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-q", "-d", "postgres", "-U", "postgres" ]
+      timeout: 45s
+      interval: 10s
+      retries: 10
+    # volumes:
+    # this mounting directory will save postgress data to local system
+    # so by upping and downing docker database data wont be lost
+      # - ./postgres/postgres_data:/var/lib/postgresql/data
+  # Adding zookeeper for kafka cluster.
+  zookeeper:
+    image: 'bitnami/zookeeper:latest'
+    container_name: 'zookeeper'
+    ports:
+      - '4444:2181'
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+
+#Kafka instance. 
+  kafka:
+    image: 'bitnami/kafka:latest'
+    container_name: 'kafka'
+    ports:
+      - '9092:9092'
+      - '9093:9093'
+    environment:
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_LISTENERS=CLIENT://:9092,EXTERNAL://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=CLIENT://kafka:9092,EXTERNAL://localhost:9093
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=CLIENT
+    depends_on:
+      - zookeeper
+
+  spark:
+    image: docker.io/bitnami/spark:2.4.6
+    container_name: spark_master
+    environment:
+      - SPARK_MODE=master
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+    ports:
+      - '8086:8080'
+
+  spark-worker:
+    image: docker.io/bitnami/spark:2.4.6
+    container_name: spark_worker
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark:7077
+      - SPARK_WORKER_MEMORY=1G
+      - SPARK_WORKER_CORES=1
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+    volumes:
+      - ./data:/opt/bitnami/spark/data_org
+      - ./spark:/opt/bitnami/spark/work
+
+  spark-submit:
+    image: docker.io/bitnami/spark:2.4.6
+    depends_on:
+      - spark
+      - spark-worker
+    container_name: spark_submit
+    user: root
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark:7077
+      - SPARK_WORKER_MEMORY=1G
+      - SPARK_WORKER_CORES=1
+      - SPARK_RPC_AUTHENTICATION_ENABLED=no
+      - SPARK_RPC_ENCRYPTION_ENABLED=no
+      - SPARK_LOCAL_STORAGE_ENCRYPTION_ENABLED=no
+      - SPARK_SSL_ENABLED=no
+    volumes:
+      - ./spark:/opt/bitnami/spark/work
+      - ./data:/opt/bitnami/spark/data_org
+    entrypoint: [ '/bin/sh', '-c' ]
+    command: |
+     "sh /opt/bitnami/spark/work/spark-submit.sh"
+  
+  #initializing cluster: creating a new topic in kafka and write json records to topic line by line
+  kafka_init_cluster:
+    image: 'bitnami/kafka:latest'
+    container_name: 'kafka_init_cluster'
+    ports:
+      - '9094:9092'
+    volumes:
+      - ./kafka:/opt/bitnami/kafka/cluster_init
+    environment:
+      - KAFKA_BROKER_ID=2
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    depends_on:
+      - kafka
+    entrypoint: ['/bin/sh', '-c']
+    command: |
+      "sh /opt/bitnami/kafka/cluster_init/run.sh"
