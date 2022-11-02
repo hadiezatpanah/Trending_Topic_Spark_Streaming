@@ -103,7 +103,7 @@ the pseudocode for ranking algorithm which is based on z-score is as follow:
 ### Ranking Algorithm (modified Z-Score)
 
 >**if** this is first batch to be processed in kafka:  
->&nbsp;&nbsp;&nbsp;&nbsp;**avg** = topic_count and sqrAvg=topic_count<sup>2</sup> for each row in the microbatch DF;  
+>&nbsp;&nbsp;&nbsp;&nbsp;**avg** = topic_count and sqrAvg=topic_count <sup>2</sup> for each row in the microbatch DF;  
 >&nbsp;&nbsp;&nbsp;&nbsp;save MicroBatch df in **TrendTable** in Spark warehouse;  
 >**else**  
 >&nbsp;&nbsp;&nbsp;&nbsp;retrieve **trend_table** from DB;  
