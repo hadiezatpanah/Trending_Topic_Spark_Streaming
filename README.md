@@ -110,7 +110,7 @@ the pseudocode for ranking algorithm which is based on z-score is as follow:
 >&nbsp;&nbsp;&nbsp;&nbsp;full outer join **trend_table** and **microbatchDF**  
 >&nbsp;&nbsp;&nbsp;&nbsp;update avg and sqrAvg in trend_table based on new observation in microbatchDF:  
 >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**avg** = avg * decay + topic_count * (1 - decay)  
->&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**sqrAvg** = sqrAvg * decay + (topic_count ^2 2) * (1 - decay)  
+>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**sqrAvg** = sqrAvg * decay + (topic_count ^ 2) * (1 - decay)  
 >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Overwrite **new trend_table** based on new avg and sqrAvg in DB;  
 >&nbsp;&nbsp;&nbsp;&nbsp;compute **trendDF** based on new avg and sqrAvg and topic observation:  
 >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;**topic_score** = (obs - avg) / std();  
