@@ -127,6 +127,11 @@ the pseudocode for ranking algorithm which is based on z-score is as follow:
 Docker is always a good choice for preparing the development 
 environment and quickly implementing the software architecture and prototyping.
 
+## Version Compatibility
+
+Scala| Spark|sbt     
+--- | --- | ---
+2.11.12| 2.4.0| 1.3.13
 
 ## Getting Started
 
@@ -177,6 +182,8 @@ The jar file will be created in the ```spark/topic_trend/topic_trend_2.11/0.1/to
 ## Author
 
 👤 **Hadi Ezatpanah**
+
+- Github: [@hadiezatpanah](https://github.com/hadiezatpanah)
 
 ## Version History
 * 0.1

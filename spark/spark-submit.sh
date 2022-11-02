@@ -12,4 +12,4 @@ spark-submit \
 --deploy-mode client  \
 --master spark://spark:7077 \
 --name  meetup_trend  \
-../work/meetup_trend/meetup_trend_2.11/0.1/meetup_trend_2.11-0.1-assembly.jar ../work/resources/config/log4j.properties ../work/resources/config/config_local.ini docker 
+../work/topic_trend/topic_trend_2.11/0.1/topic_trend_2.11-0.1-assembly.jar ../work/resources/config/log4j.properties ../work/resources/config/config_local.ini docker 
