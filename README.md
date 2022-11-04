@@ -1,4 +1,4 @@
-# Data Engineering Challenge
+# Finding Hot Topic - Spark Streaming, Scala and Kafka
 
 ## Context
 Which Meetups should we go to?
