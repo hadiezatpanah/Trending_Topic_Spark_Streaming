@@ -1,4 +1,4 @@
-# Finding Hot Topic - Spark Streaming, Scala and Kafka
+# Finding Hot Topics - Spark Streaming, Scala and Kafka
 
 ## Context
 Which Meetups should we go to?
